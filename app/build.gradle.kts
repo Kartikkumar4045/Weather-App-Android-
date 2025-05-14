@@ -58,5 +58,9 @@ dependencies {
     // retrofit
     implementation (libs.retrofit)
 
+    //auto fetch location
+    implementation (libs.play.services.location)
+
+
 
 }
