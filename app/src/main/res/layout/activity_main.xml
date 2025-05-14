@@ -16,9 +16,9 @@
         android:layout_marginTop="45dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/searchviewshape"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search For A City"
-        android:searchIcon="@drawable/search"
+        app:iconifiedByDefault="true"
+        app:queryHint="Search For A City"
+        app:searchIcon="@drawable/search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +27,7 @@
         android:id="@+id/cityName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:drawableLeft="@drawable/loctaion"
         android:drawablePadding="15dp"
         android:fontFamily="@font/merriweathersans_medium"
@@ -82,7 +82,7 @@
         android:fontFamily="@font/merriweathersans_medium"
         android:text="SUNNY"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@+id/lottieAnimationView"
         app:layout_constraintStart_toStartOf="@+id/lottieAnimationView"
         app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
@@ -91,6 +91,7 @@
         android:id="@+id/max_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/merriweathersans_regular"
         android:text="Max : 00.00 °C"
         android:textColor="@color/black"
@@ -128,7 +129,7 @@
         android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="@font/merriweathersans_regular"
         android:text="13 May 2005"
         android:textColor="@color/black"
@@ -381,5 +382,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/merriweathersans_medium"
+        android:text="Time : 00.00"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/weather"
+        app:layout_constraintEnd_toEndOf="@+id/temp"
+        app:layout_constraintStart_toStartOf="@+id/temp"
+        app:layout_constraintTop_toTopOf="@+id/weather" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

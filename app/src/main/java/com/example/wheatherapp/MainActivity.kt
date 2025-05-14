@@ -101,6 +101,18 @@ class MainActivity : AppCompatActivity() {
     private fun SearchCity() {
         val searchView = binding.searchView as SearchView
 
+        searchView.post {
+            try {
+                val searchEditText = searchView.findViewById<AutoCompleteTextView>(
+                    androidx.appcompat.R.id.search_src_text
+                )
+                searchEditText?.setTextColor(Color.BLACK)
+                searchEditText?.setHintTextColor(Color.GRAY) // 👈 Ensures visible hint
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         // Fix for setting SearchView text color
         searchView.post {
             try {
@@ -140,7 +152,10 @@ class MainActivity : AppCompatActivity() {
         val cityName = weatherData.name
         val countryCode = weatherData.sys.country
         val countryName = Locale("", countryCode).displayCountry
+        val offsetSeconds = weatherData.timezone
 
+
+        binding.time.text = "Time: ${timeWithOffset(offsetSeconds)}"
         binding.cityName.text = "$cityName, $countryName"
         binding.temp.text = "$temperature°C"
         binding.weather.text = condition
@@ -157,6 +172,15 @@ class MainActivity : AppCompatActivity() {
 
         changeImagesAcoordingToWeatherCondtion(condition)
     }
+
+    private fun timeWithOffset(offsetSeconds: Int): String {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        calendar.add(Calendar.SECOND, offsetSeconds)
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        sdf.timeZone = calendar.timeZone
+        return sdf.format(calendar.time)
+    }
+
 
 
 
