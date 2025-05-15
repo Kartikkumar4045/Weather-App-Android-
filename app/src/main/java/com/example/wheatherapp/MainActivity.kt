@@ -1,4 +1,3 @@
-// MainActivity.kt - Updated as per your requirements
 package com.example.wheatherapp
 
 import android.Manifest
@@ -243,7 +242,9 @@ class MainActivity : AppCompatActivity() {
             sunset.text = time(weatherData.sys.sunset.toLong())
             sea.text = "${weatherData.main.pressure} hPa"
             condition.text = weatherData.weather.firstOrNull()?.main ?: "Unknown"
-            time.text = "Time: ${timeWithOffset(weatherData.timezone)}"
+
+            // Use the updated function for the local time
+            time.text = "Time: ${timeWithOffset(weatherData.timezone)}" // Corrected local time
             day.text = dayName(System.currentTimeMillis())
             date.text = date()
         }
@@ -256,10 +257,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun changeImagesAcoordingToWeatherCondtion(condition: String) {
         val (bg, anim) = when (condition) {
-            "Clear", "Sunny" -> Pair(R.drawable.sunny_background, R.raw.sun)
-            "Clouds", "Overcast", "Mist" -> Pair(R.drawable.colud_background, R.raw.cloud)
-            "Rain", "Drizzle" -> Pair(R.drawable.rain_background, R.raw.rain)
-            "Snow" -> Pair(R.drawable.snow_background, R.raw.snow)
+            "Clear", "Sunny" , "Clear Sky"-> Pair(R.drawable.sunny_background, R.raw.sun)
+            "Clouds", "Overcast", "Mist", "Foggy","Partly Clouds" -> Pair(R.drawable.colud_background, R.raw.cloud)
+            "Rain", "Drizzle", "Light Rain", "Drizzle", "Moderate Rain", "Showers", "Heavy Rain" -> Pair(R.drawable.rain_background, R.raw.rain)
+            "Snow", "Light Snow", "Heavy Snow", "Moderate Snow", "Blizzard" -> Pair(R.drawable.snow_background, R.raw.snow)
             else -> Pair(R.drawable.sunny_background, R.raw.sun)
         }
         binding.root.setBackgroundResource(bg)
@@ -267,9 +268,17 @@ class MainActivity : AppCompatActivity() {
         binding.lottieAnimationView.playAnimation()
     }
 
+    // Function to calculate time with offset
     private fun timeWithOffset(offset: Int): String {
-        val now = System.currentTimeMillis() + (offset * 1000L)
-        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(now))
+        // Calculate the time in milliseconds for the specific city
+        val currentTimeMillis = System.currentTimeMillis() // Current time in UTC
+        val localTimeMillis = currentTimeMillis + (offset * 1000L) // Adjust with offset (in seconds)
+
+        // Format the local time
+        val localTime = Date(localTimeMillis) // Convert to Date object
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // Time in HH:mm format
+        timeFormat.timeZone = TimeZone.getTimeZone("GMT") // Ensure time zone is set to GMT for offset calculation
+        return timeFormat.format(localTime) // Return formatted time
     }
 
     private fun time(ts: Long): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(ts * 1000))
