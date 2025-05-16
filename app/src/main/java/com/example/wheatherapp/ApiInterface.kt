@@ -1,44 +1,46 @@
-package com.example.wheatherapp
-
+import com.example.wheatherapp.WeatherApp
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ApiInterface {
-    @GET("weather")
+
+    @GET("forecast.json")
+    fun getForecast(
+        @Query("key") apiKey: String,
+        @Query("q") cityName: String,
+        @Query("days") days: Int = 3,
+        @Query("aqi") aqi: String = "no",
+        @Query("alerts") alerts: String = "no"
+    ): Call<WeatherApp>
+
+    @GET("current.json")
     fun getWeatherData(
-        @Query("q") city: String,
-        @Query("appid") appid: String,
-        @Query("units") units: String,
-        @Query("lang") lang: String = "en"  // Added language parameter
+        @Query("q") cityName: String,
+        @Query("key") apiKey: String,
+        @Query("aqi") aqi: String = "no"
     ): Call<WeatherApp>
 
-    @GET("weather")
-    fun getWeatherByCoordinates(
-        @Query("lat") lat: Double,
-        @Query("lon") lon: Double,
-        @Query("appid") appid: String,
-        @Query("units") units: String,
-        @Query("lang") lang: String = "en"  // Added language parameter
-    ): Call<WeatherApp>
-
-    @GET("forecast")
+    @GET("forecast.json")
     fun getFiveDayForecast(
-        @Query("q") city: String,
-        @Query("appid") appid: String,
-        @Query("units") units: String,
-        @Query("cnt") cnt: Int = 40,       // Added count parameter (5 days * 8 forecasts/day)
-        @Query("lang") lang: String = "en"  // Added language parameter
-    ): Call<ForecastResponse>
+        @Query("q") cityName: String,
+        @Query("key") apiKey: String,
+        @Query("days") days: Int = 5,
+        @Query("aqi") aqi: String = "no"
+    ): Call<WeatherApp>  // Note: changed from ForecastResponse to WeatherApp
 
-    @GET("forecast")
+    @GET("current.json")
+    fun getWeatherByCoordinates(
+        @Query("q") latLon: String,   // format: "lat,lon"
+        @Query("key") apiKey: String,
+        @Query("aqi") aqi: String = "no"
+    ): Call<WeatherApp>
+
+    @GET("forecast.json")
     fun getFiveDayForecastByCoordinates(
-        @Query("lat") lat: Double,
-        @Query("lon") lon: Double,
-        @Query("appid") appid: String,
-        @Query("units") units: String,
-        @Query("cnt") cnt: Int = 40,       // Added count parameter
-        @Query("lang") lang: String = "en"  // Added language parameter
-    ): Call<ForecastResponse>
-
+        @Query("q") latLon: String,
+        @Query("key") apiKey: String,
+        @Query("days") days: Int = 5,
+        @Query("aqi") aqi: String = "no"
+    ): Call<WeatherApp>  // Note: changed from ForecastResponse to WeatherApp
 }
