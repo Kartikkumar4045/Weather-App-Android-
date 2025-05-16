@@ -291,18 +291,24 @@
                     app:layout_constraintStart_toStartOf="@+id/temp"
                     app:layout_constraintTop_toTopOf="@+id/weather" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/weather"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/merriweathersans_medium"
                     android:text="SUNNY"
                     android:textColor="@color/black"
-                    android:textSize="24sp"
+                    android:maxLines="2"
+                    android:gravity="center"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="24sp"
+                    android:autoSizeStepGranularity="1sp"
+                    app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
                     app:layout_constraintStart_toStartOf="@+id/lottieAnimationView"
-                    app:layout_constraintEnd_toEndOf="@id/lottieAnimationView"
-                    app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
+                    app:layout_constraintEnd_toEndOf="@+id/lottieAnimationView" />
 
                 <TextView
                     android:id="@+id/max_temp"

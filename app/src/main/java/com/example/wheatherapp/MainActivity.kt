@@ -211,8 +211,17 @@ class MainActivity : AppCompatActivity() {
                         forecastCache[weather.location.name] = forecast
 
                         withContext(Dispatchers.Main) {
-                            updateWeatherUI(weather)
+                            // Save forecast to cache
+                            forecastCache[weather.location.name] = forecast
+
+                            // Update city name and time
+                            binding.cityName.text = "${weather.location.name}, ${forecast.forecast.forecastday[0].day.condition.text}"
+                            binding.time.text = "Time: ${timeWithOffset(weather.location.tz_id)}"
+
+                            // Use forecast-based method to show full day's weather
+                            updateForecastForDate(forecast, forecastDates[0])
                         }
+
                     } else {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
