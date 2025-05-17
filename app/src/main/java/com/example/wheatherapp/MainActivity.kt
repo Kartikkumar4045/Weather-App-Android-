@@ -3,11 +3,9 @@ package com.example.wheatherapp
 import androidx.appcompat.widget.SearchView
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +18,6 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -32,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val weatherCache = mutableMapOf<String, WeatherApp>()
     private val forecastCache = mutableMapOf<String, WeatherApp>()
     private val forecastDates = mutableListOf<String>()
+    private var currentCity: String = ""
 
     companion object {
         const val API_KEY = "21641257cf984940b2661325251605"
@@ -50,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             setupSearchCity()
             setupCardClickEvents()
 
-            // Check location permission
             if (hasLocationPermission()) {
                 getCurrentLocation()
             } else {
@@ -87,7 +84,6 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getCurrentLocation()
             } else {
-                // Fallback to a default city if permission denied
                 fetchWeatherData("Delhi")
             }
         }
@@ -116,12 +112,18 @@ class MainActivity : AppCompatActivity() {
 
         for (i in cardViews.indices) {
             cardViews[i].setOnClickListener {
-                val city = binding.cityName.text.toString().split(",")[0].trim()
-                if (i == 0) {
-                    weatherCache[city]?.let { updateWeatherUI(it) } ?: fetchWeatherData(city)
-                } else {
-                    forecastCache[city]?.let { updateForecastForDate(it, forecastDates[i]) }
-                        ?: fetchForecastData(city)
+                if (currentCity.isNotEmpty()) {
+                    forecastCache[currentCity]?.let { forecast ->
+                        if (i == 0) {
+                            // For cardDay1, show current time weather
+                            showCurrentTimeWeather(forecast)
+                        } else {
+                            // For other cards, show daily forecast
+                            updateForecastForDate(forecast, forecastDates[i])
+                        }
+                    } ?: run {
+                        fetchForecastData(currentCity.split(",")[0].trim())
+                    }
                 }
             }
         }
@@ -138,8 +140,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateForecastUI(forecastDay: Forecastday, selectedDate: String) {
         binding.apply {
-            val city = cityName.text.toString().split(",")[0].trim()
-            cityName.text = "$city, ${forecastDay.day.condition.text}"
+            // Update city name with country
+            cityName.text = currentCity
 
             val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             selactedDay.text = if (todayStr == selectedDate) "Today" else
@@ -181,7 +183,6 @@ class MainActivity : AppCompatActivity() {
             location?.let {
                 fetchWeatherByCoordinates(it.latitude, it.longitude)
             } ?: run {
-                // Fallback if location is null
                 fetchWeatherData("Delhi")
             }
         }.addOnFailureListener { e ->
@@ -198,6 +199,8 @@ class MainActivity : AppCompatActivity() {
 
                 if (weatherResponse.isSuccessful && weatherResponse.body() != null) {
                     val weather = weatherResponse.body()!!
+                    currentCity = "${weather.location.name}, ${weather.location.country}"
+                    weatherCache[currentCity] = weather
 
                     // Fetch forecast data
                     val forecastResponse = RetrofitClient.instance.getFiveDayForecastByCoordinates(
@@ -207,37 +210,12 @@ class MainActivity : AppCompatActivity() {
 
                     if (forecastResponse.isSuccessful && forecastResponse.body() != null) {
                         val forecast = forecastResponse.body()!!
-                        weatherCache[weather.location.name] = weather
-                        forecastCache[weather.location.name] = forecast
+                        forecastCache[currentCity] = forecast
 
                         withContext(Dispatchers.Main) {
-                            // Save forecast to cache
-                            forecastCache[weather.location.name] = forecast
-
-                            // Update city name and time
-                            binding.cityName.text = "${weather.location.name}, ${forecast.forecast.forecastday[0].day.condition.text}"
-                            binding.time.text = "Time: ${timeWithOffset(weather.location.tz_id)}"
-
-                            // Use forecast-based method to show full day's weather
-                            updateForecastForDate(forecast, forecastDates[0])
+                            binding.cityName.text = currentCity
+                            showCurrentTimeWeather(forecast)
                         }
-
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Failed to get forecast data",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Failed to get weather data",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             } catch (e: Exception) {
@@ -247,14 +225,13 @@ class MainActivity : AppCompatActivity() {
                         "Network error: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
-                    Log.e("WeatherError", "Exception while fetching weather", e)
                 }
             }
         }
     }
 
     private fun setupSearchCity() {
-        val searchView = binding.searchView // This is already androidx.appcompat.widget.SearchView
+        val searchView = binding.searchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
@@ -273,39 +250,89 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitClient.instance.getWeatherData(cityName, API_KEY)
-                val weather = response.execute().body()
+                val weatherResponse = response.execute()
 
-                if (weather != null) {
-                    weatherCache[cityName] = weather
+                if (weatherResponse.isSuccessful && weatherResponse.body() != null) {
+                    val weather = weatherResponse.body()!!
+                    currentCity = "${weather.location.name}, ${weather.location.country}"
+                    weatherCache[currentCity] = weather
 
-                    withContext(Dispatchers.Main) {
-                        updateWeatherUI(weather)
-                        fetchForecastData(cityName)
+                    // Fetch forecast data
+                    val forecastResponse = RetrofitClient.instance.getFiveDayForecast(
+                        cityName,
+                        API_KEY,
+                        5
+                    ).execute()
+
+                    if (forecastResponse.isSuccessful && forecastResponse.body() != null) {
+                        val forecast = forecastResponse.body()!!
+                        forecastCache[currentCity] = forecast
+
+                        withContext(Dispatchers.Main) {
+                            //updateCityName(weather.location.name, weather.location.country)
+                            //updateForecastForDate(forecast, forecastDates[0])
+                            binding.cityName.text = currentCity
+                            showCurrentTimeWeather(forecast)
+                        }
                     }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "City not found", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: HttpException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MainActivity, "HTTP error: ${e.code()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MainActivity, "Network error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error fetching data for $cityName",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
 
-    private fun fetchForecastData(cityName: String) {
+    private fun showCurrentTimeWeather(forecast: WeatherApp) {
+        try {
+            // Get current hour in 24-hour format (e.g., "14" for 2 PM)
+            val currentHour = SimpleDateFormat("HH", Locale.getDefault()).format(Date())
+
+            // Find the hour data that matches current time
+            val currentDay = forecast.forecast.forecastday[0]
+            val currentHourData = currentDay.hour.find {
+                it.time.startsWith("${currentDay.date} $currentHour")
+            } ?: currentDay.hour.first()
+
+            // Update UI with current hour data
+            binding.apply {
+                temp.text = "${currentHourData.temp_c.roundToInt()}°C"
+                weather.text = currentHourData.condition.text
+                maxTemp.text = "Max: ${currentDay.day.maxtemp_c.roundToInt()}°C"
+                minTemp.text = "Min: ${currentDay.day.mintemp_c.roundToInt()}°C"
+                humidity.text = "${currentHourData.humidity}%"
+                windSpeed.text = "%.1f m/s".format(currentHourData.wind_kph / 3.6)
+                sunrise.text = currentDay.astro.sunrise
+                sunset.text = currentDay.astro.sunset
+                sea.text = "${currentHourData.pressure_mb} hPa"
+                condition.text = currentHourData.condition.text
+                time.text = "Time: ${timeWithOffset(forecast.location.tz_id)}"
+                day.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+                date.text = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(Date())
+            }
+
+            changeImagesAccordingToWeatherCondition(currentHourData.condition.text)
+        } catch (e: Exception) {
+            Log.e("CurrentTimeWeather", "Error showing current time weather", e)
+            // Fallback to showing day average if hourly data fails
+            updateForecastForDate(forecast, forecastDates[0])
+        }
+    }
+
+
+        private fun fetchForecastData(cityName: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitClient.instance.getFiveDayForecast(cityName, API_KEY, 5)
-                val forecast = response.execute().body()
+                val forecastResponse = response.execute()
 
-                if (forecast != null) {
+                if (forecastResponse.isSuccessful && forecastResponse.body() != null) {
+                    val forecast = forecastResponse.body()!!
                     forecastCache[cityName] = forecast
 
                     withContext(Dispatchers.Main) {
@@ -313,44 +340,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e("ForecastError", "Failed to fetch forecast", e)
-            }
-        }
-    }
-
-    private fun updateWeatherUI(weatherData: WeatherApp) {
-        try {
-            binding.apply {
-                cityName.text = "${weatherData.location.name}, ${weatherData.location.country}"
-                selactedDay.text = "Today"
-                temp.text = "${weatherData.current.temp_c.roundToInt()}°C"
-                weather.text = weatherData.current.condition.text
-
-                // Safely access forecast data
-                weatherData.forecast?.forecastday?.firstOrNull()?.let { forecastDay ->
-                    maxTemp.text = "Max: ${forecastDay.day.maxtemp_c.roundToInt()}°C"
-                    minTemp.text = "Min: ${forecastDay.day.mintemp_c.roundToInt()}°C"
-                    sunrise.text = forecastDay.astro.sunrise
-                    sunset.text = forecastDay.astro.sunset
-                } ?: run {
-                    maxTemp.text = "--"
-                    minTemp.text = "--"
-                    sunrise.text = "--"
-                    sunset.text = "--"
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error fetching forecast",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-
-                humidity.text = "${weatherData.current.humidity}%"
-                windSpeed.text = "%.1f m/s".format(weatherData.current.wind_kph / 3.6)
-                sea.text = "${weatherData.current.pressure_mb} hPa"
-                condition.text = weatherData.current.condition.text
-                time.text = "Time: ${timeWithOffset(weatherData.location.tz_id)}"
-                day.text = dayName(System.currentTimeMillis())
-                date.text = date()
             }
-            changeImagesAccordingToWeatherCondition(weatherData.current.condition.text)
-        } catch (e: Exception) {
-            Log.e("WeatherUI", "Error updating UI", e)
-            Toast.makeText(this, "Error displaying weather data", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -395,9 +392,6 @@ class MainActivity : AppCompatActivity() {
             SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         }
     }
-
-    private fun date(): String = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(Date())
-    private fun dayName(ts: Long): String = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(ts))
 
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 }

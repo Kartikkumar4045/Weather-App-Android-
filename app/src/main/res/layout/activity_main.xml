@@ -302,8 +302,7 @@
                     android:maxLines="2"
                     android:gravity="center"
                     android:ellipsize="end"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMinTextSize="18sp"
                     android:autoSizeMaxTextSize="24sp"
                     android:autoSizeStepGranularity="1sp"
                     app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
@@ -590,6 +589,74 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </FrameLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/hourlyHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/backgroundshape"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    app:layout_constraintBottom_toTopOf="@id/hourlyForecastSection"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/frameLayout">
+
+                    <TextView
+                        android:id="@+id/hourlyTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="serif"
+                        android:text="Hourly forecast ▼"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hourlyMore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:fontFamily="serif"
+                        android:text="More"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/hourlyForecastSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="#4B5B6E"
+                    android:padding="12dp"
+                    app:layout_constraintBottom_toTopOf="@id/textView11"
+                    app:layout_constraintTop_toBottomOf="@id/hourlyHeader"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/hourlyChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/viewHourlyDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="View details"
+                        android:textColor="#FFFFFF"
+                        android:textAlignment="center"
+                        android:padding="8dp"
+                        android:textSize="16sp"
+                        android:fontFamily="serif" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/textView11"

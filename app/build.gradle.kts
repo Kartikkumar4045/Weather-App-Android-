@@ -62,6 +62,10 @@ dependencies {
     //auto fetch location
     implementation (libs.play.services.location)
 
+    //chart depandancy
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+
 
 
 }
