@@ -257,7 +257,7 @@
                     android:id="@+id/selactedDay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="30dp"
+                    android:layout_marginEnd="16dp"
                     android:fontFamily="@font/merriweathersans_bold"
                     android:text="Today"
                     android:textColor="@color/black"
@@ -611,9 +611,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="serif"
+                        android:fontFamily="@font/merriweathersans_bold"
                         android:text="Hourly forecast ▼"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -621,9 +621,9 @@
                         android:id="@+id/hourlyMore"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:fontFamily="serif"
+                        android:fontFamily="@font/merriweathersans_medium"
                         android:text="More"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -633,29 +633,59 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    android:background="#4B5B6E"
+                    android:background="@drawable/backgroundshape"
                     android:padding="12dp"
                     app:layout_constraintBottom_toTopOf="@id/textView11"
                     app:layout_constraintTop_toBottomOf="@id/hourlyHeader"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/hourlyChart"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginTop="8dp" />
+                        android:layout_height="wrap_content"
+                        android:text="24-Hour Forecast"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:layout_marginBottom="8dp"/>
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <!-- Increased width to fit all 24 hours -->
+                            <com.github.mikephil.charting.charts.LineChart
+                                android:id="@+id/hourlyChart"
+                                android:layout_width="800dp"
+                                android:layout_height="200dp"
+                                android:layout_marginTop="8dp"
+                                android:outlineAmbientShadowColor="@color/black"
+                                android:outlineSpotShadowColor="@color/black"/>
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
 
                     <TextView
                         android:id="@+id/viewHourlyDetails"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="View details"
-                        android:textColor="#FFFFFF"
-                        android:textAlignment="center"
+                        android:fontFamily="@font/merriweathersans_regular"
                         android:padding="8dp"
+                        android:text="View details →"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
-                        android:fontFamily="serif" />
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center"/>
                 </LinearLayout>
 
                 <TextView
@@ -671,7 +701,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/frameLayout" />
+                    app:layout_constraintTop_toBottomOf="@id/hourlyForecastSection"
+                    />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
