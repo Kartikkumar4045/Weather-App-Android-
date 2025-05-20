@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Wheather App</string>
+    <string name="stat_icon">Weather statistic icon</string>
+    <string name="humidity_desc">Humidity icon</string>
+    <string name="wind_desc">Wind speed icon</string>
+    <string name="condition_desc">Weather condition icon</string>
+    <string name="sunrise_desc">Sunrise time icon</string>
+    <string name="sunset_desc">Sunset time icon</string>
+    <string name="sea_desc">Sea level icon</string>
 </resources>

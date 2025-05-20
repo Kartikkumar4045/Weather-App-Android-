@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/statIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:contentDescription="@string/stat_icon"
+        app:tint="?attr/colorPrimary"
+        tools:srcCompat="@raw/rain"/>
+
+    <TextView
+        android:id="@+id/statValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="0.0%"/>
+
+    <TextView
+        android:id="@+id/statTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Humidity"/>
+</LinearLayout>

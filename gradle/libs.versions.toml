@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.2"
+googleMaterial = "1.11.0"
 kotlin = "1.9.24"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -26,6 +27,7 @@ lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+material-v1110 = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
